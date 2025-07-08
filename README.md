@@ -1,22 +1,20 @@
-# भारतीय नागरिक समस्या रिपोर्टर / Indian Civic Issue Reporter
+# Indian Civic Issue Reporter
 
 A comprehensive civic management system designed specifically for Indian municipalities to help citizens report issues and get solutions from their respective local governments.
 
 ## 🌟 Features
 
-### For Citizens (नागरिकों के लिए)
-- **Multi-language Support**: Hindi and English interface
+### For Citizens
+- **Multi-language Support**: English interface
 - **Location-based Reporting**: Report issues with precise GPS coordinates
 - **Municipality Routing**: Issues automatically routed to the correct municipality based on location
 - **Photo Upload**: Attach photos to support your reports
 - **Real-time Tracking**: Track the status of your reported issues
-- **Priority Classification**: Mark issues as Low, Medium, High, or Urgent
 - **Citizen Information**: Provide contact details for follow-up
 
-### For Municipal Administrators (नगर पालिका प्रशासकों के लिए)
+### For Municipal Administrators
 - **Municipality-specific Dashboard**: View and manage issues for your specific municipality
 - **Status Management**: Update issue status (Submitted, In Progress, Resolved, Rejected)
-- **Priority Filtering**: Filter issues by priority level
 - **Citizen Communication**: Contact citizens for additional information
 - **Analytics**: View statistics and trends for your municipality
 - **Comment System**: Add administrative comments to issues
@@ -33,24 +31,24 @@ A comprehensive civic management system designed specifically for Indian municip
 - Jaipur Municipal Corporation
 - Lucknow Municipal Corporation
 
-### Issue Categories (समस्या श्रेणियां)
-- 🚰 Water Supply (पानी की आपूर्ति)
-- ⚡ Electricity (बिजली)
-- 🛣️ Roads (सड़कें)
-- 💧 Drainage (नाली)
-- 🗑️ Garbage (कचरा)
-- 💡 Streetlight (स्ट्रीट लाइट)
-- 🚦 Traffic (यातायात)
-- 🚽 Sanitation (स्वच्छता)
-- 🌳 Parks (पार्क)
-- 🚌 Public Transport (सार्वजनिक परिवहन)
-- 🔊 Noise Pollution (ध्वनि प्रदूषण)
-- 🌫️ Air Pollution (वायु प्रदूषण)
-- 🌊 Water Pollution (जल प्रदूषण)
-- 🏗️ Encroachment (अतिक्रमण)
-- 🛒 Street Vendors (फुटपाथ विक्रेता)
-- 🅿️ Parking (पार्किंग)
-- 🚻 Public Toilets (सार्वजनिक शौचालय)
+### Issue Categories
+- 🚰 Water Supply
+- ⚡ Electricity
+- 🛣️ Roads
+- 💧 Drainage
+- 🗑️ Garbage
+- 💡 Streetlight
+- 🚦 Traffic
+- 🚽 Sanitation
+- 🌳 Parks
+- 🚌 Public Transport
+- 🔊 Noise Pollution
+- 🌫️ Air Pollution
+- 🌊 Water Pollution
+- 🏗️ Encroachment
+- 🛒 Street Vendors
+- 🅿️ Parking
+- 🚻 Public Toilets
 
 ## 🚀 Getting Started
 
@@ -87,7 +85,6 @@ A comprehensive civic management system designed specifically for Indian municip
    - Click the "+" button to open the report form
    - Select your municipality
    - Choose the issue category
-   - Set priority level
    - Add your contact information
    - Upload a photo (optional)
    - Submit the report
@@ -101,7 +98,7 @@ A comprehensive civic management system designed specifically for Indian municip
 
 1. **Switch to Admin Mode**: Use the toggle in the top-right corner
 2. **Manage Issues**:
-   - Filter by municipality, status, and priority
+   - Filter by municipality and status
    - Update issue status
    - Add administrative comments
    - Contact citizens if needed
@@ -130,7 +127,7 @@ A comprehensive civic management system designed specifically for Indian municip
 - **Local Storage**: Data persists between sessions
 - **GPS Integration**: Automatic location detection
 - **Image Upload**: Support for photo evidence
-- **Multi-language**: Hindi and English interface
+- **Multi-language**: English interface
 
 ## 🏛️ Municipality Integration
 
@@ -146,13 +143,12 @@ Each municipality has:
 ```javascript
 {
   id: "unique_id",
-  title: "Issue title in Hindi/English",
+  title: "Issue title in English",
   category: "issue_category",
   description: "Detailed description",
   latitude: 23.5937,
   longitude: 78.9629,
   municipality: "municipality_id",
-  priority: "low|medium|high|urgent",
   status: "Submitted|In Progress|Resolved|Rejected",
   citizenName: "Citizen name",
   citizenPhone: "+91-9876543210",

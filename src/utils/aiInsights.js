@@ -44,7 +44,6 @@ export const generateAIInsights = (reports, timeFilter = '30d') => {
       title: 'Most Common Issues',
       description: `Top reported issues: ${topCategories.map(([cat, count]) => 
         `${getCategoryName(cat)} (${count})`).join(', ')}`,
-      priority: 'high',
       confidence: 0.9
     });
   }
@@ -56,7 +55,6 @@ export const generateAIInsights = (reports, timeFilter = '30d') => {
       icon: '⏰',
       title: 'Slow Response Times',
       description: `Average resolution time is ${avgResponseTime.toFixed(1)} days. Consider increasing resources.`,
-      priority: 'high',
       confidence: 0.85
     });
   } else if (avgResponseTime < 3) {
@@ -65,7 +63,6 @@ export const generateAIInsights = (reports, timeFilter = '30d') => {
       icon: '✅',
       title: 'Excellent Response Times',
       description: `Average resolution time is ${avgResponseTime.toFixed(1)} days. Great performance!`,
-      priority: 'medium',
       confidence: 0.9
     });
   }
@@ -78,7 +75,6 @@ export const generateAIInsights = (reports, timeFilter = '30d') => {
       icon: '📉',
       title: 'Low Resolution Rate',
       description: `Only ${resolutionRate.toFixed(1)}% of issues are resolved. Consider process improvements.`,
-      priority: 'high',
       confidence: 0.8
     });
   } else if (resolutionRate > 85) {
@@ -87,7 +83,6 @@ export const generateAIInsights = (reports, timeFilter = '30d') => {
       icon: '📈',
       title: 'High Resolution Rate',
       description: `${resolutionRate.toFixed(1)}% resolution rate shows excellent service delivery.`,
-      priority: 'medium',
       confidence: 0.9
     });
   }
@@ -108,7 +103,6 @@ export const generateAIInsights = (reports, timeFilter = '30d') => {
       icon: '📈',
       title: 'Increasing Reports',
       description: 'Report volume has increased significantly this month. Monitor for patterns.',
-      priority: 'medium',
       confidence: 0.75
     });
   }
@@ -120,7 +114,6 @@ export const generateAIInsights = (reports, timeFilter = '30d') => {
       icon: '🚗',
       title: 'High Pothole Reports',
       description: 'Potholes represent over 30% of reports. Consider road maintenance program.',
-      priority: 'high',
       confidence: 0.8
     });
   }
@@ -131,7 +124,6 @@ export const generateAIInsights = (reports, timeFilter = '30d') => {
       icon: '🗑️',
       title: 'Waste Management Focus',
       description: 'Garbage issues are frequent. Review waste collection schedules.',
-      priority: 'medium',
       confidence: 0.7
     });
   }

@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Filter } from 'lucide-react';
+import { Filter, MapPin, Globe } from 'lucide-react';
+import { getAllMunicipalities, getMunicipalityById } from '../utils/indianMunicipalities';
+import { getTranslation, translateReport } from '../utils/languagePreferences';
 
 // Fix for default markers in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -52,13 +54,15 @@ const createColoredMarker = (status) => {
   });
 };
 
-const InteractiveMap = ({ reports = [], onReportClick, onMapClick, isAdmin = false }) => {
+const InteractiveMap = ({ reports = [], onReportClick, onMapClick, isAdmin = false, userRole = 'citizen', currentLanguage = 'en' }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const [showFilters, setShowFilters] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [municipalityFilter, setMunicipalityFilter] = useState('all');
   const [mapInitialized, setMapInitialized] = useState(false);
   const [mapError, setMapError] = useState(false);
+  const municipalities = getAllMunicipalities();
 
   // Initialize map
   useEffect(() => {
@@ -75,9 +79,9 @@ const InteractiveMap = ({ reports = [], onReportClick, onMapClick, isAdmin = fal
           mapInstanceRef.current = null;
         }
 
-        // Create map with minimal configuration
+        // Create map with minimal configuration - centered on India
         map = L.map(mapRef.current);
-        map.setView([28.6139, 77.2090], 5);
+        map.setView([23.5937, 78.9629], 5); // Center of India
 
         // Add tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -142,10 +146,12 @@ const InteractiveMap = ({ reports = [], onReportClick, onMapClick, isAdmin = fal
         }
       });
 
-      // Filter reports based on status
-      const filteredReports = statusFilter === 'all' 
-        ? reports 
-        : reports.filter(report => report.status === statusFilter);
+      // Filter reports based on status and municipality
+      const filteredReports = reports.filter(report => {
+        const matchesStatus = statusFilter === 'all' || report.status === statusFilter;
+        const matchesMunicipality = municipalityFilter === 'all' || report.municipality === municipalityFilter;
+        return matchesStatus && matchesMunicipality;
+      }).map(report => translateReport(report, currentLanguage));
 
       // Add markers for each report
       filteredReports.forEach((report) => {
@@ -166,21 +172,35 @@ const InteractiveMap = ({ reports = [], onReportClick, onMapClick, isAdmin = fal
                   <p class="text-sm text-gray-600 mb-3">${report.description || 'No description'}</p>
                   <div class="space-y-1 text-xs">
                     <div class="flex justify-between">
-                      <span class="font-medium text-gray-700">Category:</span>
-                      <span class="text-gray-600">${report.category || 'Unknown'}</span>
+                      <span class="font-medium text-gray-700">${getTranslation(currentLanguage, 'issueType')}:</span>
+                      <span class="text-gray-600">${report.categoryDisplay || report.category || 'Unknown'}</span>
                     </div>
                     <div class="flex justify-between">
-                      <span class="font-medium text-gray-700">Status:</span>
+                      <span class="font-medium text-gray-700">${getTranslation(currentLanguage, 'status')}:</span>
                       <span class="px-2 py-1 rounded text-xs font-medium ${
                         report.status === 'Resolved' ? 'bg-green-100 text-green-800' :
                         report.status === 'In Progress' ? 'bg-yellow-100 text-yellow-800' :
                         'bg-red-100 text-red-800'
-                      }">${report.status || 'Unknown'}</span>
+                      }">${report.statusDisplay || report.status || 'Unknown'}</span>
                     </div>
                     <div class="flex justify-between">
-                      <span class="font-medium text-gray-700">Reported:</span>
-                      <span class="text-gray-600">${report.timestamp ? new Date(report.timestamp).toLocaleDateString() : 'Unknown date'}</span>
+                      <span class="font-medium text-gray-700">${getTranslation(currentLanguage, 'priority')}:</span>
+                      <span class="text-gray-600">${report.priorityDisplay || report.priority || 'Medium'}</span>
                     </div>
+                    <div class="flex justify-between">
+                      <span class="font-medium text-gray-700">नगर पालिका / Municipality:</span>
+                      <span class="text-gray-600">${getMunicipalityById(report.municipality)?.name || 'Unknown'}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="font-medium text-gray-700">रिपोर्ट किया गया / Reported:</span>
+                      <span class="text-gray-600">${report.timestamp ? new Date(report.timestamp).toLocaleDateString('hi-IN') : 'Unknown date'}</span>
+                    </div>
+                    ${report.citizenName ? `
+                    <div class="flex justify-between">
+                      <span class="font-medium text-gray-700">नागरिक / Citizen:</span>
+                      <span class="text-gray-600">${report.citizenName}</span>
+                    </div>
+                    ` : ''}
                   </div>
                 </div>
               `);
@@ -198,7 +218,7 @@ const InteractiveMap = ({ reports = [], onReportClick, onMapClick, isAdmin = fal
     } catch (error) {
       console.error('Error updating markers:', error);
     }
-  }, [reports, statusFilter, onReportClick, mapInitialized]);
+  }, [reports, statusFilter, municipalityFilter, onReportClick, mapInitialized]);
 
   const handleRetry = () => {
     setMapError(false);
@@ -249,36 +269,50 @@ const InteractiveMap = ({ reports = [], onReportClick, onMapClick, isAdmin = fal
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-2 mb-2">
             <Filter className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-            <span className="text-sm font-medium text-gray-900 dark:text-white">Filter</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-white">{getTranslation(currentLanguage, 'filter')}</span>
           </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="all">All Status</option>
-            <option value="Submitted">Submitted</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Resolved">Resolved</option>
-          </select>
+          <div className="space-y-2">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            >
+              <option value="all">{getTranslation(currentLanguage, 'allStatus')}</option>
+              <option value="Submitted">{getTranslation(currentLanguage, 'submitted')}</option>
+              <option value="In Progress">{getTranslation(currentLanguage, 'inProgress')}</option>
+              <option value="Resolved">{getTranslation(currentLanguage, 'resolved')}</option>
+            </select>
+            <select
+              value={municipalityFilter}
+              onChange={(e) => setMunicipalityFilter(e.target.value)}
+              className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            >
+              <option value="all">{getTranslation(currentLanguage, 'allMunicipalities')}</option>
+              {municipalities.map(municipality => (
+                <option key={municipality.id} value={municipality.id}>
+                  {municipality.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
       
       {/* Map Legend */}
       <div className="absolute bottom-4 left-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 border border-gray-200 dark:border-gray-700 z-20">
-        <div className="text-sm font-medium text-gray-900 dark:text-white mb-2">Legend</div>
+        <div className="text-sm font-medium text-gray-900 dark:text-white mb-2">{getTranslation(currentLanguage, 'legend')}</div>
         <div className="space-y-2 text-xs">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded-full bg-red-500 border-2 border-white shadow-sm"></div>
-            <span className="text-gray-600 dark:text-gray-300">Submitted/Pending</span>
+            <span className="text-gray-600 dark:text-gray-300">{getTranslation(currentLanguage, 'submitted')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded-full bg-yellow-500 border-2 border-white shadow-sm"></div>
-            <span className="text-gray-600 dark:text-gray-300">In Progress</span>
+            <span className="text-gray-600 dark:text-gray-300">{getTranslation(currentLanguage, 'inProgress')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded-full bg-green-500 border-2 border-white shadow-sm"></div>
-            <span className="text-gray-600 dark:text-gray-300">Resolved</span>
+            <span className="text-gray-600 dark:text-gray-300">{getTranslation(currentLanguage, 'resolved')}</span>
           </div>
         </div>
       </div>

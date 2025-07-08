@@ -9,6 +9,7 @@ import InteractiveMap from './InteractiveMap';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import AIDashboard from './AIDashboard';
 import CitizenDashboard from './CitizenDashboard';
+import IndianAdminDashboard from './IndianAdminDashboard';
 import ReportForm from './ReportForm';
 import { useTheme } from '../context/ThemeContext';
 
@@ -17,7 +18,8 @@ const FlexibleLayout = ({
   reports = [], 
   onSubmitReport, 
   onUpdateReport,
-  onDeleteReport 
+  onDeleteReport,
+  currentLanguage = 'en'
 }) => {
   const [activePanel, setActivePanel] = useState(userRole === 'admin' ? 'analytics' : 'dashboard');
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -162,12 +164,15 @@ const FlexibleLayout = ({
           <CitizenDashboard 
             reports={reports}
             onSubmitReport={handleSubmitReport}
+            onUpdateReport={onUpdateReport}
+            currentLanguage={currentLanguage}
           />
         ) : (
           <InteractiveMap 
             reports={reports}
             onMapClick={handleMapClick}
             userRole={userRole}
+            currentLanguage={currentLanguage}
           />
         )}
       </div>
@@ -181,150 +186,43 @@ const FlexibleLayout = ({
       >
         <Plus className="w-6 h-6" />
       </motion.button>
+
+      {/* Report Form Modal */}
+      <AnimatePresence>
+        {isFormOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+            >
+              <ReportForm
+                isOpen={isFormOpen}
+                onClose={handleCloseForm}
+                onSubmit={handleSubmitReport}
+                selectedLocation={selectedLocation}
+                currentLanguage={currentLanguage}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 
   // Admin View - Professional dashboard layout
   const renderAdminView = () => (
-    <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
-      {/* Admin Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-700 dark:from-purple-700 dark:to-purple-800 text-white flex-shrink-0">
-        <div className="px-6 py-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-1">
-                Admin Dashboard
-              </h1>
-              <p className="text-purple-100 text-sm">
-                Manage and analyze civic issues
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg border border-white/20">
-                <Shield className="w-4 h-4 text-white" />
-                <span className="text-sm font-medium text-white">
-                  {reports.length} Reports
-                </span>
-              </div>
-              <button
-                onClick={() => setShowSettings(!showSettings)}
-                className="p-2 text-white/80 hover:text-white transition-colors rounded-lg hover:bg-white/10"
-              >
-                <Settings className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-          
-          {/* Admin Quick Stats */}
-          <div className="grid grid-cols-4 gap-4">
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-              <div className="flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-purple-200" />
-                <span className="text-xs text-purple-100">Total</span>
-              </div>
-              <p className="text-lg font-bold text-white mt-1">{reports.length}</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-              <div className="flex items-center gap-2">
-                <Brain className="w-4 h-4 text-purple-200" />
-                <span className="text-xs text-purple-100">AI Active</span>
-              </div>
-              <p className="text-lg font-bold text-white mt-1">✓</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-purple-200" />
-                <span className="text-xs text-purple-100">This Week</span>
-              </div>
-              <p className="text-lg font-bold text-white mt-1">
-                {reports.filter(r => new Date(r.date).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000).length}
-              </p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-purple-200" />
-                <span className="text-xs text-purple-100">Alerts</span>
-              </div>
-              <p className="text-lg font-bold text-white mt-1">
-                {reports.filter(r => r.priority === 'high').length}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Admin Navigation */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setActivePanel('analytics')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                activePanel === 'analytics'
-                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-200'
-                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              <BarChart3 className="w-4 h-4" />
-              Analytics
-            </button>
-            <button
-              onClick={() => setActivePanel('ai')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                activePanel === 'ai'
-                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-200'
-                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              <Brain className="w-4 h-4" />
-              AI Dashboard
-            </button>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-lg transition-colors ${
-                viewMode === 'grid'
-                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-200'
-                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              <Grid className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`p-2 rounded-lg transition-colors ${
-                viewMode === 'list'
-                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-200'
-                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              <List className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      {/* Admin Content */}
-      <div className="flex-1 overflow-auto">
-        {activePanel === 'analytics' ? (
-          <AnalyticsDashboard 
-            reports={reports}
-            onUpdateReport={onUpdateReport}
-            onDeleteReport={onDeleteReport}
-            viewMode={viewMode}
-          />
-        ) : (
-          <AIDashboard 
-            reports={reports}
-            onUpdateReport={onUpdateReport}
-            viewMode={viewMode}
-          />
-        )}
-      </div>
-    </div>
+    <IndianAdminDashboard 
+      reports={reports}
+      userRole={userRole}
+      onUpdateReport={onUpdateReport}
+    />
   );
 
   return (

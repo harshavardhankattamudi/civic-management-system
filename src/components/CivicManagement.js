@@ -2,10 +2,15 @@ import React, { useState, useEffect } from 'react';
 import FlexibleLayout from './FlexibleLayout';
 import { Users, Settings } from 'lucide-react';
 import { initializeSampleData } from '../utils/sampleData';
+import LanguageSelector from './LanguageSelector';
+import LanguageDemo from './LanguageDemo';
+import { getCurrentLanguage } from '../utils/languagePreferences';
 
 const CivicManagement = () => {
   const [userRole, setUserRole] = useState('citizen');
   const [reports, setReports] = useState([]);
+  const [currentLanguage, setCurrentLanguage] = useState(getCurrentLanguage());
+  const [showLanguageDemo, setShowLanguageDemo] = useState(false);
 
   // Load reports from localStorage on component mount
   useEffect(() => {
@@ -28,16 +33,37 @@ const CivicManagement = () => {
     setReports(prev => [reportData, ...prev]);
   };
 
+  const handleUpdateReport = (updatedReport) => {
+    setReports(prevReports =>
+      prevReports.map(r => r.id === updatedReport.id ? updatedReport : r)
+    );
+  };
+
+  const handleLanguageChange = (language) => {
+    setCurrentLanguage(language);
+  };
+
   return (
     <div className="h-screen bg-white dark:bg-[#071c2f] text-gray-900 dark:text-white">
       {/* Top Bar with Role Toggle */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-[#071c2f]/90 backdrop-blur-md shadow-lg border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between px-6 py-3">
           <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-            Civic Issue Reporter
+            भारतीय नागरिक समस्या रिपोर्टर / Indian Civic Issue Reporter
           </h1>
           
           <div className="flex items-center gap-4">
+            {/* Language Demo Button */}
+            <button
+              onClick={() => setShowLanguageDemo(!showLanguageDemo)}
+              className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+            >
+              Language Demo
+            </button>
+            
+            {/* Language Selector - Show for both citizens and admins */}
+            <LanguageSelector onLanguageChange={handleLanguageChange} />
+            
             {/* Role Toggle */}
             <div className="bg-white dark:bg-gray-800 rounded-lg p-1 shadow-lg border border-gray-200 dark:border-gray-600">
               <div className="flex">
@@ -71,11 +97,19 @@ const CivicManagement = () => {
 
       {/* Main Content with Flexible Layout */}
       <div className="pt-16 h-full">
-        <FlexibleLayout 
-          reports={reports}
-          userRole={userRole}
-          onSubmitReport={handleSubmitReport}
-        />
+        {showLanguageDemo ? (
+          <div className="h-full overflow-auto">
+            <LanguageDemo />
+          </div>
+        ) : (
+          <FlexibleLayout 
+            reports={reports}
+            userRole={userRole}
+            onSubmitReport={handleSubmitReport}
+            onUpdateReport={handleUpdateReport}
+            currentLanguage={currentLanguage}
+          />
+        )}
       </div>
     </div>
   );

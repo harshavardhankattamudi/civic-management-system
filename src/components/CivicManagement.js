@@ -49,7 +49,7 @@ const CivicManagement = () => {
       <div className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-[#071c2f]/90 backdrop-blur-md shadow-lg border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between px-6 py-3">
           <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-            भारतीय नागरिक समस्या रिपोर्टर / Indian Civic Issue Reporter
+            Civic Issue Reporter
           </h1>
           
           <div className="flex items-center gap-4">

@@ -3,14 +3,12 @@ import FlexibleLayout from './FlexibleLayout';
 import { Users, Settings } from 'lucide-react';
 import { initializeSampleData } from '../utils/sampleData';
 import LanguageSelector from './LanguageSelector';
-import LanguageDemo from './LanguageDemo';
 import { getCurrentLanguage } from '../utils/languagePreferences';
 
 const CivicManagement = () => {
   const [userRole, setUserRole] = useState('citizen');
   const [reports, setReports] = useState([]);
   const [currentLanguage, setCurrentLanguage] = useState(getCurrentLanguage());
-  const [showLanguageDemo, setShowLanguageDemo] = useState(false);
 
   // Load reports from localStorage on component mount
   useEffect(() => {
@@ -53,14 +51,6 @@ const CivicManagement = () => {
           </h1>
           
           <div className="flex items-center gap-4">
-            {/* Language Demo Button */}
-            <button
-              onClick={() => setShowLanguageDemo(!showLanguageDemo)}
-              className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
-            >
-              Language Demo
-            </button>
-            
             {/* Language Selector - Show for both citizens and admins */}
             <LanguageSelector onLanguageChange={handleLanguageChange} />
             
@@ -97,19 +87,13 @@ const CivicManagement = () => {
 
       {/* Main Content with Flexible Layout */}
       <div className="pt-16 h-full">
-        {showLanguageDemo ? (
-          <div className="h-full overflow-auto">
-            <LanguageDemo />
-          </div>
-        ) : (
-          <FlexibleLayout 
-            reports={reports}
-            userRole={userRole}
-            onSubmitReport={handleSubmitReport}
-            onUpdateReport={handleUpdateReport}
-            currentLanguage={currentLanguage}
-          />
-        )}
+        <FlexibleLayout 
+          reports={reports}
+          userRole={userRole}
+          onSubmitReport={handleSubmitReport}
+          onUpdateReport={handleUpdateReport}
+          currentLanguage={currentLanguage}
+        />
       </div>
     </div>
   );

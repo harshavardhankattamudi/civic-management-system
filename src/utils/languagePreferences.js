@@ -154,7 +154,7 @@ export const translations = {
     streetVendors: '🛒 फुटपाथ विक्रेता',
     parking: '🅿️ पार्किंग',
     publicToilets: '🚻 सार्वजनिक शौचालय',
-    other: '�� अन्य',
+    other: '📋 अन्य',
     
     // Status
     submitted: 'जमा किया गया',
@@ -192,13 +192,42 @@ export const translations = {
     update: 'अपडेट करें',
     noReports: 'कोई रिपोर्ट नहीं मिली',
     status: 'स्थिति'
+  },
+  ta: {
+    // Tamil translations (add real ones later)
+  },
+  te: {
+    // Telugu translations (add real ones later)
+  },
+  bn: {
+    // Bengali translations (add real ones later)
+  },
+  mr: {
+    // Marathi translations (add real ones later)
+  },
+  gu: {
+    // Gujarati translations (add real ones later)
+  },
+  kn: {
+    // Kannada translations (add real ones later)
+  },
+  ml: {
+    // Malayalam translations (add real ones later)
+  },
+  pa: {
+    // Punjabi translations (add real ones later)
   }
 };
 
 // Function to get translation
 export const getTranslation = (language, key) => {
-  const lang = translations[language] || translations.en;
-  return lang[key] || key;
+  if (translations[language] && translations[language][key]) {
+    return translations[language][key];
+  }
+  if (translations.en[key]) {
+    return translations.en[key];
+  }
+  return key;
 };
 
 // Function to get current language from localStorage
